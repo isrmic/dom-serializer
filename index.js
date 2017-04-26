@@ -16,6 +16,12 @@ var unencodedElements = {
   noscript: true
 };
 
+var ignorePrefix = /v-|:|@/gi;
+
+function testCamelCaseReactType(str){
+    return (str.length > 3 && str[0] === str[0].toLowerCase() && str[1] === str[1].toLowerCase() && str[2] === str[2].toUpperCase());
+}
+
 /*
   Format attributes
 */
@@ -33,7 +39,10 @@ function formatAttrs(attributes, opts) {
     }
 
     output += key;
-    if ((value !== null && value !== '') || opts.xmlMode) {
+    if((ignorePrefix.test(key) || testCamelCaseReactType(key)) && value.indexOf("{")  === 0){
+        output += '=' + (opts.decodeEntities ? entities.encodeXML(value) : value);
+    }
+    else if ((value !== null && value !== '') || opts.xmlMode) {
         output += '="' + (opts.decodeEntities ? entities.encodeXML(value) : value) + '"';
     }
   }
