@@ -16,9 +16,10 @@ var unencodedElements = {
   noscript: true
 };
 
-var ignorePrefix = /v-|:|@/gi;
+var ignorePrefix = /v-[\w]+|@[\w]+/gi;
+var ignorePrefix_ = /:\w+/gi;
 
-function testCamelCaseReactType(str){
+function testePropertyReact(str){
     return (str.length > 3 && str[0] === str[0].toLowerCase() && str[1] === str[1].toLowerCase() && str[2] === str[2].toUpperCase());
 }
 
@@ -29,7 +30,8 @@ function formatAttrs(attributes, opts) {
   if (!attributes) return;
 
   var output = '',
-      value;
+      value, propvue, isobj;
+
 
   // Loop through the attributes
   for (var key in attributes) {
@@ -39,8 +41,11 @@ function formatAttrs(attributes, opts) {
     }
 
     output += key;
-    if((ignorePrefix.test(key) || testCamelCaseReactType(key)) && value.indexOf("{")  === 0){
+    propvue = (ignorePrefix.test(key) || ignorePrefix_.test(key));
+    isobj = (value.indexOf("{") === 0 && value.indexOf("}") >= 1);
+    if(!propvue && isobj){
         output += '=' + (opts.decodeEntities ? entities.encodeXML(value) : value);
+        // console.log(key, propvue);
     }
     else if ((value !== null && value !== '') || opts.xmlMode) {
         output += '="' + (opts.decodeEntities ? entities.encodeXML(value) : value) + '"';
