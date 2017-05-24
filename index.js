@@ -1,6 +1,7 @@
 /*
   Module dependencies
 */
+
 var ElementType = require('domelementtype');
 var entities = require('entities');
 
@@ -32,6 +33,7 @@ function formatAttrs(attributes, opts) {
   var output = '',
       value, propvue, isobj;
 
+  let typecomponent = global.typecomponent;
 
   // Loop through the attributes
   for (var key in attributes) {
@@ -40,14 +42,18 @@ function formatAttrs(attributes, opts) {
       output += ' ';
     }
 
+    typecomponent === "react" && key === "class" ? key = "className" : null;
+
     output += key;
     propvue = (ignorePrefix.test(key) || ignorePrefix_.test(key));
     isobj = (value.indexOf("{") === 0 && value.indexOf("}") >= 1);
     if(!propvue && isobj){
+
         output += '=' + (opts.decodeEntities ? entities.encodeXML(value) : value);
         // console.log(key, propvue);
     }
     else if ((value !== null && value !== '') || opts.xmlMode) {
+
         output += '="' + (opts.decodeEntities ? entities.encodeXML(value) : value) + '"';
     }
   }
