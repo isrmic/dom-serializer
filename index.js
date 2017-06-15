@@ -17,13 +17,28 @@ var unencodedElements = {
   noscript: true
 };
 
+var chars = [
+    "=",
+    "{",
+    "}",
+    "(",
+    ")",
+    ".",
+    ","
+];
+
 var ignorePrefix = /v-[\w]+|@[\w]+/gi;
 var ignorePrefix_ = /:\w+/gi;
 
 function testePropertyReact(str){
     return (str.length > 3 && str[0] === str[0].toLowerCase() && str[1] === str[1].toLowerCase() && str[2] === str[2].toUpperCase());
 }
-
+function verifyValue(str){
+    for(let value in chars)
+        if(str.indexOf(chars[value]) >= 0)
+            return true;
+    return false;
+}
 /*
   Format attributes
 */
@@ -44,13 +59,17 @@ function formatAttrs(attributes, opts) {
 
     typecomponent === "react" && key === "class" ? key = "className" : null;
 
+
     output += key;
     propvue = (ignorePrefix.test(key) || ignorePrefix_.test(key));
-    isobj = (value.indexOf("{") === 0 && value.indexOf("}") >= 1);
+    isobj = (value.indexOf("{") === 0 && (verifyValue(value)));
     if(!propvue && isobj){
 
         output += '=' + (opts.decodeEntities ? entities.encodeXML(value) : value);
-        // console.log(key, propvue);
+
+    }
+    else if(verifyValue(key)){
+        output += '' + (opts.decodeEntities ? entities.encodeXML(value) : value) + '';
     }
     else if ((value !== null && value !== '') || opts.xmlMode) {
 
